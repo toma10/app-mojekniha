@@ -1,6 +1,8 @@
 import Head from 'next/head'
+import React from 'react'
+import Title from '@components/Title'
 
-export default function Home() {
+const Home = (): JSX.Element => {
   return (
     <div className="container">
       <Head>
@@ -9,14 +11,11 @@ export default function Home() {
       </Head>
 
       <main>
-        <h1 className="title">
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+        <Title />
 
         <p className="description">
           Get started by editing <code>pages/index.js</code>
         </p>
-
         <div className="grid">
           <a href="https://nextjs.org/docs" className="card">
             <h3>Documentation &rarr;</h3>
@@ -207,3 +206,5 @@ export default function Home() {
     </div>
   )
 }
+
+export default Home
