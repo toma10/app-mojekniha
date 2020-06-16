@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint --ignore-path .gitignore .",
     "check-types": "tsc",
-    "prettier": "prettier --ignore-path .gitignore \"**/*.+(js|json|ts|tsx|css)\"",
+    "prettier": "prettier --ignore-path .gitignore \"**/*.+(js|json|ts|tsx)\"",
     "format": "yarn prettier --write",
     "check-format": "yarn prettier --list-different",
     "validate": "yarn check-types && yarn check-format && yarn lint && yarn build"
@@ -30,6 +30,7 @@
     "eslint-plugin-react": "^7.20.0",
     "eslint-plugin-react-hooks": "^4.0.4",
     "husky": "^4.2.5",
+    "lint-staged": "^10.2.10",
     "prettier": "^2.0.5",
     "typescript": "^3.9.5"
   }
