@@ -1,7 +1,7 @@
-import {Book, PaginationLinks} from 'interfaces'
+import {Author, PaginationLinks} from 'interfaces'
 import {fetcher, url} from 'utils'
 
-import BookList from '@components/BookList'
+import AuthorList from '@components/AuthorList'
 import {GetServerSideProps} from 'next'
 import Layout from '@components/Layout'
 import Pagination from '@components/Pagination'
@@ -12,39 +12,39 @@ import useSWR from 'swr'
 
 export const getServerSideProps: GetServerSideProps = async context => {
   const page = context.query.page || '1'
-  const books = await fetcher(url(`books?page=${page}`))
+  const authors = await fetcher(url(`authors?page=${page}`))
 
   return {
     props: {
-      books,
+      authors,
     },
   }
 }
 
 type Props = {
-  books: {
-    data: Book[]
+  authors: {
+    data: Author[]
     meta: {
       links: PaginationLinks
     }
   }
 }
 
-const HomePage = (props: Props): JSX.Element => {
+const AuthorsPage = (props: Props): JSX.Element => {
   const router = useRouter()
   const page = router.query.page || '1'
-  const {data: books} = useSWR(() => url(`books?page=${page}`), {
-    initialData: props.books,
+  const {data: authors} = useSWR(() => url(`authors?page=${page}`), {
+    initialData: props.authors,
   })
 
   return (
     <Layout>
       <Spacer y={8}>
-        <BookList books={books.data} />
-        <Pagination url="/" links={books.meta.links} />
+        <AuthorList authors={authors.data} />
+        <Pagination url="/" links={authors.meta.links} />
       </Spacer>
     </Layout>
   )
 }
 
-export default HomePage
+export default AuthorsPage
