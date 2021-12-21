@@ -45,7 +45,6 @@ const AuthorDetail = ({author}: Props): JSX.Element => {
         <div>
           <Title>{author.name}</Title>
           <Info>
-            {' '}
             <Link
               href="/nationalities/[id]"
               as={`/nationalities/${author.nationality.id}`}
