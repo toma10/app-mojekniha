@@ -9,12 +9,8 @@ import Title from './Atoms/Title'
 import {formattedBornDie} from 'utils'
 import tw from 'twin.macro'
 
-const Shortener = tw.div`
-  truncate w-144
-`
-
 const Bio = tw.div`
-  w-144 text-gray-900 space-y-2
+  w-full max-w-3xl text-gray-900 space-y-2
 `
 
 type BiographyProps = {
@@ -22,23 +18,7 @@ type BiographyProps = {
 }
 
 function Biography({author}: BiographyProps): JSX.Element {
-  const [showFullBiography, setShowFullBiography] = React.useState(false)
-
-  return showFullBiography ? (
-    <Bio dangerouslySetInnerHTML={{__html: author.formatted_biography}} />
-  ) : (
-    <div>
-      <Shortener
-        dangerouslySetInnerHTML={{__html: author.biography}}
-      ></Shortener>
-      <button
-        onClick={() => setShowFullBiography(true)}
-        className="text-indigo-700 focus:outline-none"
-      >
-        Zobrazit celý životopis
-      </button>
-    </div>
-  )
+  return <Bio dangerouslySetInnerHTML={{__html: author.formatted_biography}} />
 }
 
 const Header = tw.div`
