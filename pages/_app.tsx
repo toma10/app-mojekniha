@@ -1,5 +1,6 @@
 import 'tailwindcss/dist/base.min.css'
 import 'tailwindcss/dist/utilities.min.css'
+import '../styles/app.css'
 
 import {Hydrate, QueryClient, QueryClientProvider} from 'react-query'
 

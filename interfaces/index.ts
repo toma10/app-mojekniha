@@ -46,6 +46,8 @@ export interface PlainBook {
   description: string
   formatted_description: string
   release_year: number
+  average_rating: number | null
+  ratings_count: number
   cover_url: string
 }
 

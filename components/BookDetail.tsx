@@ -3,6 +3,7 @@ import {BookDetail as BookDetailType, Genre, Tag} from 'interfaces'
 import A from './Atoms/A'
 import Link from 'next/link'
 import LinksList from './LinksList'
+import RatingStart from './RatingStart'
 import React from 'react'
 import Spacer from './Spacer'
 import Title from './Atoms/Title'
@@ -66,6 +67,10 @@ const BookDetail = ({book}: Props): JSX.Element => {
           <Img src={book.cover_url} alt={book.name} />
         </ImgContainer>
         <Spacer y={3}>
+          <RatingStart
+            rating={book.average_rating}
+            count={book.ratings_count}
+          />
           <Ul>
             <Li>Originální název: {book.original_name}</Li>
             <Li>Vydáno: {book.release_year}</Li>
