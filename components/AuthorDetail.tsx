@@ -22,12 +22,14 @@ function Biography({author}: BiographyProps): JSX.Element {
 }
 
 const Header = tw.div`
-  flex items-center space-x-4
+  sm:flex sm:items-center space-y-2 sm:space-y-0 sm:space-x-4
 `
 
 const Portrait = tw.img`
   flex-shrink-0 object-cover w-24 h-24 rounded-full
 `
+
+const BasicInfo = tw.div``
 
 const Info = tw.h3`
   text-sm text-gray-700
@@ -42,7 +44,7 @@ const AuthorDetail = ({author}: Props): JSX.Element => {
     <Spacer y={4}>
       <Header>
         <Portrait src={author.portrait_url} alt={author.name} />
-        <div>
+        <BasicInfo>
           <Title>{author.name}</Title>
           <Info>
             <Link
@@ -54,7 +56,7 @@ const AuthorDetail = ({author}: Props): JSX.Element => {
             </Link>
             , {formattedBornDie(author)}
           </Info>
-        </div>
+        </BasicInfo>
       </Header>
       <Biography author={author} />
       {author.series.length > 0 && (

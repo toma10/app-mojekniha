@@ -11,6 +11,10 @@ import tw from 'twin.macro'
 
 const Header = tw.div``
 
+const TitleWrapper = tw.div`
+  sm:flex sm:justify-between sm:items-center
+`
+
 const Content = tw.div`
   grid gap-12 sm:grid-cols-2
 `
@@ -57,7 +61,13 @@ const BookDetail = ({book}: Props): JSX.Element => {
   return (
     <Spacer y={3}>
       <Header>
-        <Title>{book.name}</Title>
+        <TitleWrapper>
+          <Title>{book.name}</Title>
+          <RatingStart
+            rating={book.average_rating}
+            count={book.ratings_count}
+          />
+        </TitleWrapper>
         <Link href="/authors/[id]" as={`/authors/${book.author.id}`} passHref>
           <A>{book.author.name}</A>
         </Link>
@@ -67,10 +77,6 @@ const BookDetail = ({book}: Props): JSX.Element => {
           <Img src={book.cover_url} alt={book.name} />
         </ImgContainer>
         <Spacer y={3}>
-          <RatingStart
-            rating={book.average_rating}
-            count={book.ratings_count}
-          />
           <Ul>
             <Li>Originální název: {book.original_name}</Li>
             <Li>Vydáno: {book.release_year}</Li>
