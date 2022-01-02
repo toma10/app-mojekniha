@@ -80,7 +80,7 @@ const Pagination = ({url, links}: Props): JSX.Element => {
     : `${url}?page=${new URL(links.previous.url).searchParams.get('page')}`
 
   const nextLinkDisabled = links.next.url === null
-  const nexteLinkHref = nextLinkDisabled
+  const nextLinkHref = nextLinkDisabled
     ? '/'
     : `${url}?page=${new URL(links.next.url).searchParams.get('page')}`
 
@@ -99,7 +99,7 @@ const Pagination = ({url, links}: Props): JSX.Element => {
           </Link>
         ))}
       </Links>
-      <Link href={nexteLinkHref} passHref>
+      <Link href={nextLinkHref} passHref>
         <PrevNextA isDisabled={nextLinkDisabled}>
           {links.next.label}
           <RightArrow />
