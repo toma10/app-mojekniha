@@ -30,7 +30,7 @@ const Navbar = (): JSX.Element => {
         </Link>
       </TopBar>
       <Nav>
-        <NavLink href="/">Novinky</NavLink>
+        <NavLink href="/">Knihy</NavLink>
         <NavLink href="/authors">Autoři</NavLink>
       </Nav>
     </Wrapper>
