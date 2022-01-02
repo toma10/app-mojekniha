@@ -14,8 +14,12 @@ const Content = tw.div`
   grid gap-12 sm:grid-cols-2
 `
 
+const ImgContainer = tw.div`
+  aspect-w-2 aspect-h-3
+`
+
 const Img = tw.img`
-  w-full
+  object-cover
 `
 
 const Description = tw.div`
@@ -58,7 +62,9 @@ const BookDetail = ({book}: Props): JSX.Element => {
         </Link>
       </Header>
       <Content>
-        <Img src={book.cover_url} alt={book.name} />
+        <ImgContainer>
+          <Img src={book.cover_url} alt={book.name} />
+        </ImgContainer>
         <Spacer y={3}>
           <Ul>
             <Li>Originální název: {book.original_name}</Li>

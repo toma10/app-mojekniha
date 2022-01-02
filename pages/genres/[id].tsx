@@ -1,5 +1,5 @@
-import {Book, Genre, PaginationLinks} from 'interfaces'
-import {fetcher, url} from 'utils'
+import {QueryClient, dehydrate, useQuery} from 'react-query'
+import {defaultListQueryOptions, fetchBooks, fetchGenre} from 'api'
 
 import BookList from '@components/BookList'
 import {GetServerSideProps} from 'next'
@@ -9,52 +9,56 @@ import Pagination from '@components/Pagination'
 import React from 'react'
 import Spacer from '@components/Spacer'
 import {useRouter} from 'next/router'
-import useSWR from 'swr'
 
 export const getServerSideProps: GetServerSideProps = async context => {
-  const {id} = context.params
-  const page = context.query.page || '1'
+  const queryClient = new QueryClient()
+  const id = context.params.id as string
+  const page = (context.query.page as string) || '1'
 
-  const genres = await fetcher(url(`genres/${id}`))
-  const books = await fetcher(url(`books?filter[genres.id]=${id}&page=${page}`))
+  await queryClient.prefetchQuery(['genre', id], () => fetchGenre(id))
+  await queryClient.prefetchQuery(['books', page, 'genre', id], () =>
+    fetchBooks(page, {'genres.id': id}),
+  )
 
   return {
     props: {
-      genres,
-      books,
+      dehydratedState: dehydrate(queryClient),
     },
   }
 }
 
-type Props = {
-  genres: {
-    data: Genre
-  }
-  books: {
-    data: Book[]
-    meta: {
-      links: PaginationLinks
-    }
-  }
-}
-
-const GenresPage = (props: Props): JSX.Element => {
+const GenrePage = (): JSX.Element => {
   const router = useRouter()
-  const {id} = router.query
-  const page = router.query.page || '1'
+  const id = (router.query.id as string) || '1'
+  const page = (router.query.page as string) || '1'
 
-  const {data: genres} = useSWR(() => (id ? url(`genres/${id}`) : null), {
-    initialData: props.genres,
-  })
-  const {data: books} = useSWR(
-    () => (id ? url(`books?filter[genres.id]=${id}&page=${page}`) : null),
-    {initialData: props.books},
+  const {
+    data: genre,
+    isLoading: genreIsLoading,
+    isError: genreIsError,
+  } = useQuery(['genre', id], () => fetchGenre(id))
+  const {
+    data: books,
+    isLoading: booksIsLoading,
+    isError: booksIsError,
+  } = useQuery(
+    ['books', page, 'genre', id],
+    () => fetchBooks(page, {'genres.id': id}),
+    defaultListQueryOptions(),
   )
+
+  if (booksIsLoading || genreIsLoading) {
+    return <div>Loading</div>
+  }
+
+  if (booksIsError || genreIsError) {
+    return <div>Error</div>
+  }
 
   return (
     <Layout>
       <Spacer y={4}>
-        <MutedSubTitle>Žánr: {genres.data.name}</MutedSubTitle>
+        <MutedSubTitle>Žánr: {genre.data.name}</MutedSubTitle>
         <Spacer y={8}>
           <BookList books={books.data} />
           <Pagination url={`/genres/${id}`} links={books.meta.links} />
@@ -64,4 +68,4 @@ const GenresPage = (props: Props): JSX.Element => {
   )
 }
 
-export default GenresPage
+export default GenrePage

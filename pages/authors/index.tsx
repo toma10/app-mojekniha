@@ -1,5 +1,5 @@
-import {Author, PaginationLinks} from 'interfaces'
-import {fetcher, url} from 'utils'
+import {QueryClient, dehydrate, useQuery} from 'react-query'
+import {defaultListQueryOptions, fetchAuthors} from 'api'
 
 import AuthorList from '@components/AuthorList'
 import {GetServerSideProps} from 'next'
@@ -8,34 +8,37 @@ import Pagination from '@components/Pagination'
 import React from 'react'
 import Spacer from '@components/Spacer'
 import {useRouter} from 'next/router'
-import useSWR from 'swr'
 
 export const getServerSideProps: GetServerSideProps = async context => {
-  const page = context.query.page || '1'
-  const authors = await fetcher(url(`authors?page=${page}`))
+  const queryClient = new QueryClient()
+  const page = (context.query.page as string) || '1'
+
+  await queryClient.prefetchQuery(['authors', page], () => fetchAuthors(page))
 
   return {
     props: {
-      authors,
+      dehydratedState: dehydrate(queryClient),
     },
   }
 }
 
-type Props = {
-  authors: {
-    data: Author[]
-    meta: {
-      links: PaginationLinks
-    }
-  }
-}
-
-const AuthorsPage = (props: Props): JSX.Element => {
+const AuthorsPage = (): JSX.Element => {
   const router = useRouter()
-  const page = router.query.page || '1'
-  const {data: authors} = useSWR(() => url(`authors?page=${page}`), {
-    initialData: props.authors,
-  })
+  const page = (router.query.page as string) || '1'
+
+  const {data: authors, isLoading, isError} = useQuery(
+    ['authors', page],
+    () => fetchAuthors(page),
+    defaultListQueryOptions(),
+  )
+
+  if (isLoading) {
+    return <div>Loading</div>
+  }
+
+  if (isError) {
+    return <div>Error</div>
+  }
 
   return (
     <Layout>

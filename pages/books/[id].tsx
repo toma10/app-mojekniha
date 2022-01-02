@@ -1,40 +1,44 @@
-import {fetcher, url} from 'utils'
+import {QueryClient, dehydrate, useQuery} from 'react-query'
 
 import BookDetail from '@components/BookDetail'
-import {BookDetail as BookDetailType} from 'interfaces'
 import {GetServerSideProps} from 'next'
 import Layout from '@components/Layout'
 import React from 'react'
+import {fetchBook} from 'api'
 import {useRouter} from 'next/router'
-import useSWR from 'swr'
 
 export const getServerSideProps: GetServerSideProps = async context => {
-  const {id} = context.params
-  const books = await fetcher(url(`books/${id}`))
+  const queryClient = new QueryClient()
+  const id = context.params.id as string
+
+  await queryClient.prefetchQuery(['book', id], () => fetchBook(id))
 
   return {
     props: {
-      books,
+      dehydratedState: dehydrate(queryClient),
     },
   }
 }
 
-type Props = {
-  books: {
-    data: BookDetailType
-  }
-}
-
-const BookPage = (props: Props): JSX.Element => {
+const BookPage = (): JSX.Element => {
   const router = useRouter()
-  const {id} = router.query
-  const {data: books} = useSWR(() => (id ? url(`books/${id}`) : null), {
-    initialData: props.books,
-  })
+  const id = router.query.id as string
+
+  const {data: book, isLoading, isError} = useQuery(['book', id], () =>
+    fetchBook(id),
+  )
+
+  if (isLoading) {
+    return <div>Loading</div>
+  }
+
+  if (isError) {
+    return <div>Error</div>
+  }
 
   return (
     <Layout>
-      <BookDetail book={books.data} />
+      <BookDetail book={book.data} />
     </Layout>
   )
 }

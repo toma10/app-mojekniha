@@ -1,14 +1,24 @@
 import {Author} from '@interfaces/index'
-import {baseApiPath} from '../config'
-import fetch from 'isomorphic-unfetch'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function fetcher(url: string): Promise<any> {
-  return fetch(url).then(r => r.json())
-}
+export function buildQueryString(
+  page = '1',
+  filters: Record<string, string | number> = null,
+): string {
+  if (filters) {
+    const filtersQueryString = Object.entries(filters)
+      .filter(Boolean)
+      .reduce(
+        (queryString, [key, value]) =>
+          queryString.length === 0
+            ? `filter[${key}]=${value}`
+            : `${queryString}&filter[${key}]=${value}`,
+        '',
+      )
 
-export function url(path: string): string {
-  return `${baseApiPath}/${path}`
+    return `${filtersQueryString}&page=${page}`
+  }
+
+  return `page=${page}`
 }
 
 export function formattedBornDie(author: Author): string {

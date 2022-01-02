@@ -1,38 +1,14 @@
-import {fetcher, formattedBornDie, url} from '../../utils'
-
-import fetch from 'isomorphic-unfetch'
-
-const fetchMock = fetch as jest.Mock
-
-jest.mock('isomorphic-unfetch')
-jest.mock('../../config', () => ({
-  baseApiPath: 'test.dev/api',
-}))
+import {buildQueryString, formattedBornDie} from '../../utils'
 
 describe('utils', () => {
-  test('fetching data from url', async () => {
-    const mockJson = jest.fn(() => ({
-      data: {
-        books: [],
-      },
-    }))
-
-    fetchMock.mockResolvedValueOnce(Promise.resolve({json: mockJson}))
-
-    const result = await fetcher('test.dev/books')
-
-    expect(fetchMock).toHaveBeenCalledTimes(1)
-    expect(fetchMock).toHaveBeenCalledWith('test.dev/books')
-    expect(mockJson).toHaveBeenCalledTimes(1)
-    expect(result).toEqual({
-      data: {
-        books: [],
-      },
-    })
-  })
-
-  test('building url', () => {
-    expect(url('books')).toEqual('test.dev/api/books')
+  test('building query string', () => {
+    expect(buildQueryString('1')).toEqual('page=1')
+    expect(buildQueryString('2', {'author.id': 1})).toEqual(
+      'filter[author.id]=1&page=2',
+    )
+    expect(buildQueryString('3', {'author.id': 1, 'genre.id': 4})).toEqual(
+      'filter[author.id]=1&filter[genre.id]=4&page=3',
+    )
   })
 
   test('formatting author born – die date', () => {

@@ -1,4 +1,4 @@
-import {fetcher, url} from 'utils'
+import {QueryClient, dehydrate, useQuery} from 'react-query'
 
 import A from '@components/Atoms/A'
 import {GetServerSideProps} from 'next'
@@ -7,35 +7,38 @@ import Link from 'next/link'
 import MutedSubTitle from '@components/Atoms/MutedSubTitle'
 import PlainBookList from '@components/PlainBookList'
 import React from 'react'
-import {SeriesDetail as SeriesDetailType} from 'interfaces'
 import Spacer from '@components/Spacer'
+import {fetchSeries} from 'api'
 import {useRouter} from 'next/router'
-import useSWR from 'swr'
 
 export const getServerSideProps: GetServerSideProps = async context => {
-  const {id} = context.params
-  const series = await fetcher(url(`series/${id}`))
+  const queryClient = new QueryClient()
+  const id = context.params.id as string
+
+  await queryClient.prefetchQuery(['series', id], () => fetchSeries(id))
 
   return {
     props: {
-      series,
+      dehydratedState: dehydrate(queryClient),
     },
   }
 }
 
-type Props = {
-  series: {
-    data: SeriesDetailType
-  }
-}
-
-const SeriesPage = (props: Props): JSX.Element => {
+const SeriesPage = (): JSX.Element => {
   const router = useRouter()
-  const {id} = router.query
-  const {data: series} = useSWR(() => (id ? url(`series/${id}`) : null), {
-    initialData: props.series,
-  })
-  console.log(series)
+  const id = router.query.id as string
+
+  const {data: series, isLoading, isError} = useQuery(['series', id], () =>
+    fetchSeries(id),
+  )
+
+  if (isLoading) {
+    return <div>Loading</div>
+  }
+
+  if (isError) {
+    return <div>Error</div>
+  }
 
   return (
     <Layout>

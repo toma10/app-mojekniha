@@ -2,6 +2,7 @@ import {Book} from '@interfaces/index'
 import Card from './Atoms/Card'
 import CardBody from './Atoms/CardBody'
 import CardImg from './Atoms/CardImg'
+import CardImgContainer from './Atoms/CardImgContainer'
 import CardSubtitleA from './Atoms/CardSubtitleA'
 import CardTitleA from './Atoms/CardTitleA'
 import Link from 'next/link'
@@ -16,7 +17,9 @@ const BookListItem = ({book}: Props): JSX.Element => {
     <Card>
       <Link href="/books/[id]" as={`/books/${book.id}`}>
         <a>
-          <CardImg src={book.cover_url} alt={book.name} />
+          <CardImgContainer>
+            <CardImg src={book.cover_url} alt={book.name} />
+          </CardImgContainer>
         </a>
       </Link>
       <CardBody>

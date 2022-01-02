@@ -1,36 +1,40 @@
-import {fetcher, url} from 'utils'
+import {QueryClient, dehydrate, useQuery} from 'react-query'
 
 import AuthorDetail from '@components/AuthorDetail'
-import {AuthorDetail as AuthorDetailType} from 'interfaces'
 import {GetServerSideProps} from 'next'
 import Layout from '@components/Layout'
 import React from 'react'
+import {fetchAuthor} from 'api'
 import {useRouter} from 'next/router'
-import useSWR from 'swr'
 
 export const getServerSideProps: GetServerSideProps = async context => {
-  const {id} = context.params
-  const author = await fetcher(url(`authors/${id}`))
+  const queryClient = new QueryClient()
+  const id = context.params.id as string
+
+  await queryClient.prefetchQuery(['author', id], () => fetchAuthor(id))
 
   return {
     props: {
-      author,
+      dehydratedState: dehydrate(queryClient),
     },
   }
 }
 
-type Props = {
-  author: {
-    data: AuthorDetailType
-  }
-}
-
-const AuthorPage = (props: Props): JSX.Element => {
+const AuthorPage = (): JSX.Element => {
   const router = useRouter()
-  const {id} = router.query
-  const {data: author} = useSWR(() => (id ? url(`authors/${id}`) : null), {
-    initialData: props.author,
-  })
+  const id = router.query.id as string
+
+  const {data: author, isLoading, isError} = useQuery(['author', id], () =>
+    fetchAuthor(id),
+  )
+
+  if (isLoading) {
+    return <div>Loading</div>
+  }
+
+  if (isError) {
+    return <div>Error</div>
+  }
 
   return (
     <Layout>

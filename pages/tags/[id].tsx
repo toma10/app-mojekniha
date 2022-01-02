@@ -1,5 +1,5 @@
-import {Book, Genre, PaginationLinks} from 'interfaces'
-import {fetcher, url} from 'utils'
+import {QueryClient, dehydrate, useQuery} from 'react-query'
+import {defaultListQueryOptions, fetchBooks, fetchTag} from 'api'
 
 import BookList from '@components/BookList'
 import {GetServerSideProps} from 'next'
@@ -9,52 +9,55 @@ import Pagination from '@components/Pagination'
 import React from 'react'
 import Spacer from '@components/Spacer'
 import {useRouter} from 'next/router'
-import useSWR from 'swr'
 
 export const getServerSideProps: GetServerSideProps = async context => {
-  const {id} = context.params
-  const page = context.query.page || '1'
+  const queryClient = new QueryClient()
+  const id = context.params.id as string
+  const page = (context.query.page as string) || '1'
 
-  const tags = await fetcher(url(`tags/${id}`))
-  const books = await fetcher(url(`books?filter[tags.id]=${id}&page=${page}`))
+  await queryClient.prefetchQuery(['tag', id], () => fetchTag(id))
+  await queryClient.prefetchQuery(['books', page, 'tag', id], () =>
+    fetchBooks(page, {'tags.id': id}),
+  )
 
   return {
     props: {
-      tags,
-      books,
+      dehydratedState: dehydrate(queryClient),
     },
   }
 }
 
-type Props = {
-  tags: {
-    data: Genre
-  }
-  books: {
-    data: Book[]
-    meta: {
-      links: PaginationLinks
-    }
-  }
-}
-
-const TagsPage = (props: Props): JSX.Element => {
+const TagPage = (): JSX.Element => {
   const router = useRouter()
-  const {id} = router.query
-  const page = router.query.page || '1'
+  const id = (router.query.id as string) || '1'
+  const page = (router.query.page as string) || '1'
 
-  const {data: tags} = useSWR(() => (id ? url(`tags/${id}`) : null), {
-    initialData: props.tags,
-  })
-  const {data: books} = useSWR(
-    () => (id ? url(`books?filter[tags.id]=${id}&page=${page}`) : null),
-    {initialData: props.books},
+  const {data: tag, isLoading: tagIsLoading, isError: tagIsError} = useQuery(
+    ['tag', id],
+    () => fetchTag(id),
   )
+  const {
+    data: books,
+    isLoading: booksIsLoading,
+    isError: booksIsError,
+  } = useQuery(
+    ['books', page, 'tag', id],
+    () => fetchBooks(page, {'tags.id': id}),
+    defaultListQueryOptions(),
+  )
+
+  if (booksIsLoading || tagIsLoading) {
+    return <div>Loading</div>
+  }
+
+  if (booksIsError || tagIsError) {
+    return <div>Error</div>
+  }
 
   return (
     <Layout>
       <Spacer y={4}>
-        <MutedSubTitle>Štítek: {tags.data.name}</MutedSubTitle>
+        <MutedSubTitle>Štítek: {tag.data.name}</MutedSubTitle>
         <Spacer y={8}>
           <BookList books={books.data} />
           <Pagination url={`/tags/${id}`} links={books.meta.links} />
@@ -64,4 +67,4 @@ const TagsPage = (props: Props): JSX.Element => {
   )
 }
 
-export default TagsPage
+export default TagPage
