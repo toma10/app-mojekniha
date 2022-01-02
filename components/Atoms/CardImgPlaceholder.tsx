@@ -1,5 +1,5 @@
 import tw from 'twin.macro'
 
 export default tw.div`
-  w-full h-96 bg-gray-200
+  w-full h-full bg-gray-100
 `

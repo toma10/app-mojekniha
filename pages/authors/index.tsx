@@ -5,6 +5,7 @@ import AuthorList from '@components/AuthorList'
 import {GetServerSideProps} from 'next'
 import Layout from '@components/Layout'
 import Pagination from '@components/Pagination'
+import PlaceholdersList from '@components/PlaceholdersList'
 import React from 'react'
 import Spacer from '@components/Spacer'
 import {useRouter} from 'next/router'
@@ -32,20 +33,16 @@ const AuthorsPage = (): JSX.Element => {
     defaultListQueryOptions(),
   )
 
-  if (isLoading) {
-    return <div>Loading</div>
-  }
-
-  if (isError) {
-    return <div>Error</div>
-  }
-
   return (
     <Layout>
-      <Spacer y={8}>
-        <AuthorList authors={authors.data} />
-        <Pagination url="/" links={authors.meta.links} />
-      </Spacer>
+      {isLoading || isError ? (
+        <PlaceholdersList items={15} />
+      ) : (
+        <Spacer y={8}>
+          <AuthorList authors={authors.data} />
+          <Pagination url="/" links={authors.meta.links} />
+        </Spacer>
+      )}
     </Layout>
   )
 }

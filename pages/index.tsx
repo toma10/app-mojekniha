@@ -5,6 +5,7 @@ import BookList from '@components/BookList'
 import {GetServerSideProps} from 'next'
 import Layout from '@components/Layout'
 import Pagination from '@components/Pagination'
+import PlaceholdersList from '@components/PlaceholdersList'
 import React from 'react'
 import Spacer from '@components/Spacer'
 import {useRouter} from 'next/router'
@@ -32,20 +33,16 @@ const HomePage = (): JSX.Element => {
     defaultListQueryOptions(),
   )
 
-  if (isLoading) {
-    return <div>Loading</div>
-  }
-
-  if (isError) {
-    return <div>Error</div>
-  }
-
   return (
     <Layout>
-      <Spacer y={8}>
-        <BookList books={books.data} />
-        <Pagination url="/" links={books.meta.links} />
-      </Spacer>
+      {isLoading || isError ? (
+        <PlaceholdersList items={15} />
+      ) : (
+        <Spacer y={8}>
+          <BookList books={books.data} />
+          <Pagination url="/" links={books.meta.links} />
+        </Spacer>
+      )}
     </Layout>
   )
 }

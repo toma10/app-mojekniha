@@ -6,6 +6,7 @@ import {GetServerSideProps} from 'next'
 import Layout from '@components/Layout'
 import MutedSubTitle from '@components/Atoms/MutedSubTitle'
 import Pagination from '@components/Pagination'
+import PlaceholdersList from '@components/PlaceholdersList'
 import React from 'react'
 import Spacer from '@components/Spacer'
 import {useRouter} from 'next/router'
@@ -49,23 +50,25 @@ const NationalityPage = (): JSX.Element => {
     defaultListQueryOptions(),
   )
 
-  if (authorsIsLoading || nationalityIsLoading) {
-    return <div>Loading</div>
-  }
-
-  if (authorsIsError || nationalityIsError) {
-    return <div>Error</div>
-  }
+  const isLoading = nationalityIsLoading || authorsIsLoading
+  const isError = nationalityIsError || authorsIsError
 
   return (
     <Layout>
-      <Spacer y={4}>
-        <MutedSubTitle>Národnost: {nationality.data.name}</MutedSubTitle>
-        <Spacer y={8}>
-          <AuthorList authors={authors.data} />
-          <Pagination url={`/nationalities/${id}`} links={authors.meta.links} />
+      {isLoading || isError ? (
+        <PlaceholdersList items={15} />
+      ) : (
+        <Spacer y={4}>
+          <MutedSubTitle>Národnost: {nationality.data.name}</MutedSubTitle>
+          <Spacer y={8}>
+            <AuthorList authors={authors.data} />
+            <Pagination
+              url={`/nationalities/${id}`}
+              links={authors.meta.links}
+            />
+          </Spacer>
         </Spacer>
-      </Spacer>
+      )}
     </Layout>
   )
 }

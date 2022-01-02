@@ -5,6 +5,7 @@ import {GetServerSideProps} from 'next'
 import Layout from '@components/Layout'
 import Link from 'next/link'
 import MutedSubTitle from '@components/Atoms/MutedSubTitle'
+import PlaceholdersList from '@components/PlaceholdersList'
 import PlainBookList from '@components/PlainBookList'
 import React from 'react'
 import Spacer from '@components/Spacer'
@@ -32,34 +33,30 @@ const SeriesPage = (): JSX.Element => {
     fetchSeries(id),
   )
 
-  if (isLoading) {
-    return <div>Loading</div>
-  }
-
-  if (isError) {
-    return <div>Error</div>
-  }
-
   return (
     <Layout>
-      <Spacer y={4}>
-        <div>
-          <MutedSubTitle>Série: {series.data.name}</MutedSubTitle>
-          <MutedSubTitle>
-            Autor:{' '}
-            <Link
-              href="/authors/[id]"
-              as={`/authors/${series.data.author.id}`}
-              passHref
-            >
-              <A>{series.data.author.name}</A>
-            </Link>
-          </MutedSubTitle>
-        </div>
-        <Spacer y={8}>
-          <PlainBookList books={series.data.books} />
+      {isLoading || isError ? (
+        <PlaceholdersList items={15} />
+      ) : (
+        <Spacer y={4}>
+          <div>
+            <MutedSubTitle>Série: {series.data.name}</MutedSubTitle>
+            <MutedSubTitle>
+              Autor:{' '}
+              <Link
+                href="/authors/[id]"
+                as={`/authors/${series.data.author.id}`}
+                passHref
+              >
+                <A>{series.data.author.name}</A>
+              </Link>
+            </MutedSubTitle>
+          </div>
+          <Spacer y={8}>
+            <PlainBookList books={series.data.books} />
+          </Spacer>
         </Spacer>
-      </Spacer>
+      )}
     </Layout>
   )
 }

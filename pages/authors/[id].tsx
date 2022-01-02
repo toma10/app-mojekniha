@@ -3,6 +3,7 @@ import {QueryClient, dehydrate, useQuery} from 'react-query'
 import AuthorDetail from '@components/AuthorDetail'
 import {GetServerSideProps} from 'next'
 import Layout from '@components/Layout'
+import Loader from '@components/Loader'
 import React from 'react'
 import {fetchAuthor} from 'api'
 import {useRouter} from 'next/router'
@@ -28,17 +29,13 @@ const AuthorPage = (): JSX.Element => {
     fetchAuthor(id),
   )
 
-  if (isLoading) {
-    return <div>Loading</div>
-  }
-
-  if (isError) {
-    return <div>Error</div>
-  }
-
   return (
     <Layout>
-      <AuthorDetail author={author.data} />
+      {isLoading || isError ? (
+        <Loader />
+      ) : (
+        <AuthorDetail author={author.data} />
+      )}
     </Layout>
   )
 }

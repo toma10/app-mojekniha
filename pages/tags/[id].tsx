@@ -6,6 +6,7 @@ import {GetServerSideProps} from 'next'
 import Layout from '@components/Layout'
 import MutedSubTitle from '@components/Atoms/MutedSubTitle'
 import Pagination from '@components/Pagination'
+import PlaceholdersList from '@components/PlaceholdersList'
 import React from 'react'
 import Spacer from '@components/Spacer'
 import {useRouter} from 'next/router'
@@ -46,23 +47,22 @@ const TagPage = (): JSX.Element => {
     defaultListQueryOptions(),
   )
 
-  if (booksIsLoading || tagIsLoading) {
-    return <div>Loading</div>
-  }
-
-  if (booksIsError || tagIsError) {
-    return <div>Error</div>
-  }
+  const isLoading = booksIsLoading || tagIsLoading
+  const isError = booksIsError || tagIsError
 
   return (
     <Layout>
-      <Spacer y={4}>
-        <MutedSubTitle>Štítek: {tag.data.name}</MutedSubTitle>
-        <Spacer y={8}>
-          <BookList books={books.data} />
-          <Pagination url={`/tags/${id}`} links={books.meta.links} />
+      {isLoading || isError ? (
+        <PlaceholdersList items={15} />
+      ) : (
+        <Spacer y={4}>
+          <MutedSubTitle>Štítek: {tag.data.name}</MutedSubTitle>
+          <Spacer y={8}>
+            <BookList books={books.data} />
+            <Pagination url={`/tags/${id}`} links={books.meta.links} />
+          </Spacer>
         </Spacer>
-      </Spacer>
+      )}
     </Layout>
   )
 }

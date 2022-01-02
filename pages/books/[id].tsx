@@ -3,6 +3,7 @@ import {QueryClient, dehydrate, useQuery} from 'react-query'
 import BookDetail from '@components/BookDetail'
 import {GetServerSideProps} from 'next'
 import Layout from '@components/Layout'
+import Loader from '@components/Loader'
 import React from 'react'
 import {fetchBook} from 'api'
 import {useRouter} from 'next/router'
@@ -28,17 +29,9 @@ const BookPage = (): JSX.Element => {
     fetchBook(id),
   )
 
-  if (isLoading) {
-    return <div>Loading</div>
-  }
-
-  if (isError) {
-    return <div>Error</div>
-  }
-
   return (
     <Layout>
-      <BookDetail book={book.data} />
+      {isLoading || isError ? <Loader /> : <BookDetail book={book.data} />}
     </Layout>
   )
 }
