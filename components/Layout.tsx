@@ -35,7 +35,7 @@ const Layout = ({children, title}: Props): JSX.Element => {
         <Navbar />
       </Header>
       <Main>{children}</Main>
-      <Footer>© 2020 MojeKniha</Footer>
+      <Footer>© {new Date().getFullYear()} MojeKniha</Footer>
     </Container>
   )
 }
