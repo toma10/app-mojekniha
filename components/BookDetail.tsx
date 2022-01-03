@@ -96,7 +96,7 @@ const BookDetail = ({book}: Props): JSX.Element => {
               Žánry: <LinksList items={book.genres} renderItem={renderGenre} />
             </Li>
             <Li>
-              Tagy: <LinksList items={book.tags} renderItem={renderTag} />
+              Štítky: <LinksList items={book.tags} renderItem={renderTag} />
             </Li>
           </Ul>
           <Description
