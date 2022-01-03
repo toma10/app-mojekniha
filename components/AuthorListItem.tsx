@@ -2,6 +2,7 @@ import {Author} from '@interfaces/index'
 import Card from './Atoms/Card'
 import CardBody from './Atoms/CardBody'
 import CardImg from './Atoms/CardImg'
+import CardImgContainer from './Atoms/CardImgContainer'
 import CardSubtitle from './Atoms/CardSubtitle'
 import CardTitleA from './Atoms/CardTitleA'
 import Link from 'next/link'
@@ -17,7 +18,9 @@ const AuthorListItem = ({author}: Props): JSX.Element => {
     <Card>
       <Link href="/authors/[id]" as={`/authors/${author.id}`}>
         <a>
-          <CardImg src={author.portrait_url} alt={author.name} />
+          <CardImgContainer>
+            <CardImg src={author.portrait_url} alt={author.name} />
+          </CardImgContainer>
         </a>
       </Link>
       <CardBody>
