@@ -24,7 +24,7 @@ class MyDocument extends Document {
 
   render(): JSX.Element {
     return (
-      <Html>
+      <Html lang="cs">
         <Head />
         <Body>
           <Main />
