@@ -12,7 +12,7 @@ type Props = {
   author: Author
 }
 
-const BookListItem = ({author}: Props): JSX.Element => {
+const AuthorListItem = ({author}: Props): JSX.Element => {
   return (
     <Card>
       <Link href="/authors/[id]" as={`/authors/${author.id}`}>
@@ -32,4 +32,4 @@ const BookListItem = ({author}: Props): JSX.Element => {
   )
 }
 
-export default BookListItem
+export default AuthorListItem
