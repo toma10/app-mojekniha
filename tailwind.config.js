@@ -1,11 +1,6 @@
 module.exports = {
-  purge: [],
   theme: {
-    extend: {
-      height: {
-        '96': '24rem',
-      },
-    },
+    extend: {},
   },
   variants: {},
   plugins: [require('@tailwindcss/aspect-ratio')],
