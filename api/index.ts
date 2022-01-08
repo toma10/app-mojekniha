@@ -9,18 +9,48 @@ import {
   SeriesDetail,
   Tag,
 } from 'interfaces'
+import {UseQueryResult, useQuery} from 'react-query'
 
-import axios from 'axios'
-import {baseApiPath} from '../config'
 import {buildQueryString} from 'utils'
+import instance from './instance'
 
-const instance = axios.create({
-  baseURL: baseApiPath,
-  headers: {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-  },
-})
+type FiltersType = Record<string, string | number>
+
+const authorKeys = {
+  list: (page: string, filters: FiltersType = null): Array<unknown> => [
+    'authors',
+    'list',
+    page,
+    filters,
+  ],
+  detail: (id: string): Array<string> => ['authors', 'detail', id],
+}
+
+const bookKeys = {
+  list: (page: string, filters: FiltersType = null): Array<unknown> => [
+    'books',
+    'list',
+    page,
+    filters,
+  ],
+  detail: (id: string): Array<string> => ['books', 'detail', id],
+}
+
+const genreKeys = {
+  detail: (id: string): Array<string> => ['genres', 'detail', id],
+}
+
+const nationalityKeys = {
+  detail: (id: string): Array<string> => ['nationalities', 'detail', id],
+}
+
+const seriesKeys = {
+  detail: (id: string): Array<string> => ['series', 'detail', id],
+}
+
+const tagKeys = {
+  detail: (id: string): Array<string> => ['tags', 'detail', id],
+}
 
 function defaultListQueryOptions(overrides = {}): Record<string, unknown> {
   return {
@@ -30,92 +60,162 @@ function defaultListQueryOptions(overrides = {}): Record<string, unknown> {
   }
 }
 
-type AuthorsPromiseType = {
+type AuthorListResponse = {
   data: Author[]
   meta: {
     links: PaginationLinks
   }
 }
 
-async function fetchAuthors(
-  page = '1',
-  filters: Record<string, string | number> = null,
-): Promise<AuthorsPromiseType> {
-  const queryString = buildQueryString(page, filters)
-  return instance.get(`authors?${queryString}`).then(data => data.data)
-}
-
-type AuthorPromiseType = {
+type AuthorDetailResponse = {
   data: AuthorDetail
 }
 
-async function fetchAuthor(id: string): Promise<AuthorPromiseType> {
+async function fetchAuthors(
+  page = '1',
+  filters: Record<string, string | number> = null,
+): Promise<AuthorListResponse> {
+  const queryString = buildQueryString(page, filters)
+  const response = await instance.get(`authors?${queryString}`)
+  return response.data
+}
+
+async function fetchAuthor(id: string): Promise<AuthorDetailResponse> {
   return instance.get(`authors/${id}`).then(data => data.data)
 }
 
-type BooksPromiseType = {
+function useAuthorsQuery(
+  page: string,
+  filters: FiltersType = null,
+): UseQueryResult<AuthorListResponse, Error> {
+  return useQuery(
+    authorKeys.list(page, filters),
+    () => fetchAuthors(page, filters),
+    defaultListQueryOptions(),
+  )
+}
+
+function useAuthorQuery(
+  id: string,
+): UseQueryResult<AuthorDetailResponse, Error> {
+  return useQuery(authorKeys.detail(id), () => fetchAuthor(id))
+}
+
+type BookListResponse = {
   data: Book[]
   meta: {
     links: PaginationLinks
   }
 }
 
-async function fetchBooks(
-  page = '1',
-  filters: Record<string, string | number> = null,
-): Promise<BooksPromiseType> {
-  const queryString = buildQueryString(page, filters)
-  return instance.get(`books?${queryString}`).then(data => data.data)
-}
-
-type BookPromiseType = {
+type BookDetailResponse = {
   data: BookDetail
 }
 
-async function fetchBook(id: string): Promise<BookPromiseType> {
-  return instance.get(`books/${id}`).then(data => data.data)
+async function fetchBooks(
+  page: string,
+  filters: FiltersType = null,
+): Promise<BookListResponse> {
+  const queryString = buildQueryString(page, filters)
+  const response = await instance.get(`books?${queryString}`)
+  return response.data
 }
 
-type GenrePromiseType = {
+async function fetchBook(id: string): Promise<BookDetailResponse> {
+  const response = await instance.get(`books/${id}`)
+  return response.data
+}
+
+function useBooksQuery(
+  page: string,
+  filters: FiltersType = null,
+): UseQueryResult<BookListResponse, Error> {
+  return useQuery(
+    bookKeys.list(page, filters),
+    () => fetchBooks(page, filters),
+    defaultListQueryOptions(),
+  )
+}
+
+function useBookQuery(id: string): UseQueryResult<BookDetailResponse, Error> {
+  return useQuery(bookKeys.detail(id), () => fetchBook(id))
+}
+
+type GenreDetailResponse = {
   data: Genre
 }
 
-async function fetchGenre(id: string): Promise<GenrePromiseType> {
+async function fetchGenre(id: string): Promise<GenreDetailResponse> {
   return instance.get(`genres/${id}`).then(data => data.data)
 }
 
-type NationalityPromiseType = {
-  data: Nationality
+function useGenreQuery(id: string): UseQueryResult<GenreDetailResponse, Error> {
+  return useQuery(genreKeys.detail(id), () => fetchGenre(id))
 }
 
-async function fetchNationality(id: string): Promise<NationalityPromiseType> {
+type NationalityDetailResponse = {
+  data: Nationality
+}
+async function fetchNationality(
+  id: string,
+): Promise<NationalityDetailResponse> {
   return instance.get(`nationalities/${id}`).then(data => data.data)
 }
 
-type SeriesPromiseType = {
+function useNationalityQuery(
+  id: string,
+): UseQueryResult<NationalityDetailResponse, Error> {
+  return useQuery(nationalityKeys.detail(id), () => fetchNationality(id))
+}
+
+type SeriesDetailResponse = {
   data: SeriesDetail
 }
 
-async function fetchSeries(id: string): Promise<SeriesPromiseType> {
+async function fetchSeries(id: string): Promise<SeriesDetailResponse> {
   return instance.get(`series/${id}`).then(data => data.data)
 }
 
-type TagPromiseType = {
+function useSeriesQuery(
+  id: string,
+): UseQueryResult<SeriesDetailResponse, Error> {
+  return useQuery(seriesKeys.detail(id), () => fetchSeries(id))
+}
+
+type TagDetailResponse = {
   data: Tag
 }
 
-async function fetchTag(id: string): Promise<TagPromiseType> {
+async function fetchTag(id: string): Promise<TagDetailResponse> {
   return instance.get(`tags/${id}`).then(data => data.data)
 }
 
+function useTagQuery(id: string): UseQueryResult<TagDetailResponse, Error> {
+  return useQuery(tagKeys.detail(id), () => fetchTag(id))
+}
+
 export {
+  authorKeys,
+  bookKeys,
+  genreKeys,
+  nationalityKeys,
+  seriesKeys,
+  tagKeys,
   defaultListQueryOptions,
   fetchAuthors,
   fetchAuthor,
+  useAuthorsQuery,
+  useAuthorQuery,
   fetchBooks,
   fetchBook,
+  useBooksQuery,
+  useBookQuery,
   fetchGenre,
+  useGenreQuery,
   fetchNationality,
+  useNationalityQuery,
   fetchSeries,
+  useSeriesQuery,
   fetchTag,
+  useTagQuery,
 }

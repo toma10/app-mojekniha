@@ -1,5 +1,12 @@
-import {QueryClient, dehydrate, useQuery} from 'react-query'
-import {defaultListQueryOptions, fetchBooks, fetchGenre} from 'api'
+import {QueryClient, dehydrate} from 'react-query'
+import {
+  bookKeys,
+  fetchBooks,
+  fetchGenre,
+  useBooksQuery,
+  useGenreQuery,
+  genreKeys,
+} from 'api'
 
 import BookList from '@components/BookList'
 import {GetServerSideProps} from 'next'
@@ -16,8 +23,8 @@ export const getServerSideProps: GetServerSideProps = async context => {
   const id = context.params.id as string
   const page = (context.query.page as string) || '1'
 
-  await queryClient.prefetchQuery(['genre', id], () => fetchGenre(id))
-  await queryClient.prefetchQuery(['books', page, 'genre', id], () =>
+  await queryClient.prefetchQuery(genreKeys.detail(id), () => fetchGenre(id))
+  await queryClient.prefetchQuery(bookKeys.list(page, {'genres.id': id}), () =>
     fetchBooks(page, {'genres.id': id}),
   )
 
@@ -37,16 +44,12 @@ const GenrePage = (): JSX.Element => {
     data: genre,
     isLoading: genreIsLoading,
     isError: genreIsError,
-  } = useQuery(['genre', id], () => fetchGenre(id))
+  } = useGenreQuery(id)
   const {
     data: books,
     isLoading: booksIsLoading,
     isError: booksIsError,
-  } = useQuery(
-    ['books', page, 'genre', id],
-    () => fetchBooks(page, {'genres.id': id}),
-    defaultListQueryOptions(),
-  )
+  } = useBooksQuery(page, {'genres.id': id})
 
   const isLoading = genreIsLoading || booksIsLoading
   const isError = genreIsError || booksIsError

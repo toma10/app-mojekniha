@@ -1,18 +1,18 @@
-import {QueryClient, dehydrate, useQuery} from 'react-query'
+import {QueryClient, dehydrate} from 'react-query'
+import {bookKeys, fetchBook, useBookQuery} from 'api'
 
 import BookDetail from '@components/BookDetail'
 import {GetServerSideProps} from 'next'
 import Layout from '@components/Layout'
 import Loader from '@components/Loader'
 import React from 'react'
-import {fetchBook} from 'api'
 import {useRouter} from 'next/router'
 
 export const getServerSideProps: GetServerSideProps = async context => {
   const queryClient = new QueryClient()
   const id = context.params.id as string
 
-  await queryClient.prefetchQuery(['book', id], () => fetchBook(id))
+  await queryClient.prefetchQuery(bookKeys.detail(id), () => fetchBook(id))
 
   return {
     props: {
@@ -25,9 +25,7 @@ const BookPage = (): JSX.Element => {
   const router = useRouter()
   const id = router.query.id as string
 
-  const {data: book, isLoading, isError} = useQuery(['book', id], () =>
-    fetchBook(id),
-  )
+  const {data: book, isLoading, isError} = useBookQuery(id)
 
   return (
     <Layout>

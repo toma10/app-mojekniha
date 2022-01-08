@@ -1,5 +1,12 @@
-import {QueryClient, dehydrate, useQuery} from 'react-query'
-import {defaultListQueryOptions, fetchBooks, fetchTag} from 'api'
+import {QueryClient, dehydrate} from 'react-query'
+import {
+  bookKeys,
+  fetchBooks,
+  fetchTag,
+  tagKeys,
+  useBooksQuery,
+  useTagQuery,
+} from 'api'
 
 import BookList from '@components/BookList'
 import {GetServerSideProps} from 'next'
@@ -16,8 +23,8 @@ export const getServerSideProps: GetServerSideProps = async context => {
   const id = context.params.id as string
   const page = (context.query.page as string) || '1'
 
-  await queryClient.prefetchQuery(['tag', id], () => fetchTag(id))
-  await queryClient.prefetchQuery(['books', page, 'tag', id], () =>
+  await queryClient.prefetchQuery(tagKeys.detail(id), () => fetchTag(id))
+  await queryClient.prefetchQuery(bookKeys.list(page, {'tags.id': id}), () =>
     fetchBooks(page, {'tags.id': id}),
   )
 
@@ -33,19 +40,14 @@ const TagPage = (): JSX.Element => {
   const id = (router.query.id as string) || '1'
   const page = (router.query.page as string) || '1'
 
-  const {data: tag, isLoading: tagIsLoading, isError: tagIsError} = useQuery(
-    ['tag', id],
-    () => fetchTag(id),
+  const {data: tag, isLoading: tagIsLoading, isError: tagIsError} = useTagQuery(
+    id,
   )
   const {
     data: books,
     isLoading: booksIsLoading,
     isError: booksIsError,
-  } = useQuery(
-    ['books', page, 'tag', id],
-    () => fetchBooks(page, {'tags.id': id}),
-    defaultListQueryOptions(),
-  )
+  } = useBooksQuery(page, {'tags.id': id})
 
   const isLoading = booksIsLoading || tagIsLoading
   const isError = booksIsError || tagIsError

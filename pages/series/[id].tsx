@@ -1,4 +1,4 @@
-import {QueryClient, dehydrate, useQuery} from 'react-query'
+import {QueryClient, dehydrate} from 'react-query'
 
 import A from '@components/Atoms/A'
 import {GetServerSideProps} from 'next'
@@ -9,14 +9,14 @@ import PlaceholdersList from '@components/PlaceholdersList'
 import PlainBookList from '@components/PlainBookList'
 import React from 'react'
 import Spacer from '@components/Spacer'
-import {fetchSeries} from 'api'
+import {fetchSeries, seriesKeys, useSeriesQuery} from 'api'
 import {useRouter} from 'next/router'
 
 export const getServerSideProps: GetServerSideProps = async context => {
   const queryClient = new QueryClient()
   const id = context.params.id as string
 
-  await queryClient.prefetchQuery(['series', id], () => fetchSeries(id))
+  await queryClient.prefetchQuery(seriesKeys.detail(id), () => fetchSeries(id))
 
   return {
     props: {
@@ -29,9 +29,7 @@ const SeriesPage = (): JSX.Element => {
   const router = useRouter()
   const id = router.query.id as string
 
-  const {data: series, isLoading, isError} = useQuery(['series', id], () =>
-    fetchSeries(id),
-  )
+  const {data: series, isLoading, isError} = useSeriesQuery(id)
 
   return (
     <Layout>

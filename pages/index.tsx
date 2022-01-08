@@ -1,5 +1,5 @@
-import {QueryClient, dehydrate, useQuery} from 'react-query'
-import {defaultListQueryOptions, fetchBooks} from 'api'
+import {QueryClient, dehydrate} from 'react-query'
+import {bookKeys, fetchBooks, useBooksQuery} from 'api'
 
 import BookList from '@components/BookList'
 import {GetServerSideProps} from 'next'
@@ -14,7 +14,7 @@ export const getServerSideProps: GetServerSideProps = async context => {
   const queryClient = new QueryClient()
   const page = (context.query.page as string) || '1'
 
-  await queryClient.prefetchQuery(['books', page], () => fetchBooks(page))
+  await queryClient.prefetchQuery(bookKeys.list(page), () => fetchBooks(page))
 
   return {
     props: {
@@ -27,11 +27,7 @@ const HomePage = (): JSX.Element => {
   const router = useRouter()
   const page = (router.query.page as string) || '1'
 
-  const {data: books, isLoading, isError} = useQuery(
-    ['books', page],
-    () => fetchBooks(page),
-    defaultListQueryOptions(),
-  )
+  const {data: books, isLoading, isError} = useBooksQuery(page)
 
   return (
     <Layout>

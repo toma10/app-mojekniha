@@ -1,5 +1,5 @@
-import {QueryClient, dehydrate, useQuery} from 'react-query'
-import {defaultListQueryOptions, fetchAuthors} from 'api'
+import {QueryClient, dehydrate} from 'react-query'
+import {authorKeys, fetchAuthors, useAuthorsQuery} from 'api'
 
 import AuthorList from '@components/AuthorList'
 import {GetServerSideProps} from 'next'
@@ -14,7 +14,9 @@ export const getServerSideProps: GetServerSideProps = async context => {
   const queryClient = new QueryClient()
   const page = (context.query.page as string) || '1'
 
-  await queryClient.prefetchQuery(['authors', page], () => fetchAuthors(page))
+  await queryClient.prefetchQuery(authorKeys.list(page), () =>
+    fetchAuthors(page),
+  )
 
   return {
     props: {
@@ -27,11 +29,7 @@ const AuthorsPage = (): JSX.Element => {
   const router = useRouter()
   const page = (router.query.page as string) || '1'
 
-  const {data: authors, isLoading, isError} = useQuery(
-    ['authors', page],
-    () => fetchAuthors(page),
-    defaultListQueryOptions(),
-  )
+  const {data: authors, isLoading, isError} = useAuthorsQuery(page)
 
   return (
     <Layout>

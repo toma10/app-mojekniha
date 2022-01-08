@@ -1,18 +1,18 @@
-import {QueryClient, dehydrate, useQuery} from 'react-query'
+import {QueryClient, dehydrate} from 'react-query'
+import {authorKeys, fetchAuthor, useAuthorQuery} from 'api'
 
 import AuthorDetail from '@components/AuthorDetail'
 import {GetServerSideProps} from 'next'
 import Layout from '@components/Layout'
 import Loader from '@components/Loader'
 import React from 'react'
-import {fetchAuthor} from 'api'
 import {useRouter} from 'next/router'
 
 export const getServerSideProps: GetServerSideProps = async context => {
   const queryClient = new QueryClient()
   const id = context.params.id as string
 
-  await queryClient.prefetchQuery(['author', id], () => fetchAuthor(id))
+  await queryClient.prefetchQuery(authorKeys.detail(id), () => fetchAuthor(id))
 
   return {
     props: {
@@ -25,9 +25,7 @@ const AuthorPage = (): JSX.Element => {
   const router = useRouter()
   const id = router.query.id as string
 
-  const {data: author, isLoading, isError} = useQuery(['author', id], () =>
-    fetchAuthor(id),
-  )
+  const {data: author, isLoading, isError} = useAuthorQuery(id)
 
   return (
     <Layout>

@@ -1,5 +1,12 @@
-import {QueryClient, dehydrate, useQuery} from 'react-query'
-import {defaultListQueryOptions, fetchAuthors, fetchNationality} from 'api'
+import {QueryClient, dehydrate} from 'react-query'
+import {
+  authorKeys,
+  fetchAuthors,
+  fetchNationality,
+  nationalityKeys,
+  useAuthorsQuery,
+  useNationalityQuery,
+} from 'api'
 
 import AuthorList from '@components/AuthorList'
 import {GetServerSideProps} from 'next'
@@ -16,11 +23,12 @@ export const getServerSideProps: GetServerSideProps = async context => {
   const id = context.params.id as string
   const page = (context.query.page as string) || '1'
 
-  await queryClient.prefetchQuery(['nationality', id], () =>
+  await queryClient.prefetchQuery(nationalityKeys.detail(id), () =>
     fetchNationality(id),
   )
-  await queryClient.prefetchQuery(['authors', page, 'nationality', id], () =>
-    fetchAuthors(page, {'nationality.id': id}),
+  await queryClient.prefetchQuery(
+    authorKeys.list(page, {'nationality.id': id}),
+    () => fetchAuthors(page, {'nationality.id': id}),
   )
 
   return {
@@ -39,16 +47,12 @@ const NationalityPage = (): JSX.Element => {
     data: nationality,
     isLoading: nationalityIsLoading,
     isError: nationalityIsError,
-  } = useQuery(['nationality', id], () => fetchNationality(id))
+  } = useNationalityQuery(id)
   const {
     data: authors,
     isLoading: authorsIsLoading,
     isError: authorsIsError,
-  } = useQuery(
-    ['authors', page, 'nationality', id],
-    () => fetchAuthors(page, {'nationality.id': id}),
-    defaultListQueryOptions(),
-  )
+  } = useAuthorsQuery(page, {'nationality.id': id})
 
   const isLoading = nationalityIsLoading || authorsIsLoading
   const isError = nationalityIsError || authorsIsError
